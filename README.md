@@ -1,3 +1,38 @@
+# Fork: Smart Connections with MCP Integration
+
+> **This is a fork of [brianpetro/obsidian-smart-connections](https://github.com/brianpetro/obsidian-smart-connections)** with added MCP (Model Context Protocol) server integration.
+
+## 🚀 What We Added: MCP Server
+
+This fork includes an **MCP server** that enables integration with Claude Code and other MCP-compatible clients:
+
+- **🔍 Vector similarity search** - Access Smart Connections' AI-powered note discovery
+- **🧠 Embedding generation** - Generate embeddings using TaylorAI/bge-micro-v2 model
+- **📊 Knowledge base statistics** - Get insights into your Smart Connections data
+- **🔌 Programmatic access** - External tools can leverage Smart Connections capabilities
+
+The MCP server allows tools like Claude Code to search your Obsidian vault using Smart Connections' powerful semantic search capabilities.
+
+## 📦 Installation
+
+Since this is a fork, it's not available in the official Obsidian Community Plugins store. You can install it using our one-line installer:
+
+### Quick Install (Recommended)
+
+Run this command from your Obsidian vault directory:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/alfypops/obsidian-smart-connections/main/install.sh | bash
+```
+
+### Manual Install
+
+1. Download the latest release from [Releases](https://github.com/alfypops/obsidian-smart-connections/releases)
+2. Extract the files to `YourVault/.obsidian/plugins/smart-connections/`
+3. Enable the plugin in Obsidian Settings → Community Plugins
+
+---
+
 <h2 align="center">
 More time for what matters most<br>
 <a href="https://smartconnections.app/?utm_source=README-what-matters-most" target="_external"><img src="./assets/SC-OP-more-time-for.gif" alt="More time for what matters most" width="300"/></a>

@@ -1,0 +1,80 @@
+name: Release Plugin
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Verify build files exist
+      run: |
+        if [ ! -f "dist/main.js" ] || [ ! -f "dist/manifest.json" ]; then
+          echo "Error: Built files not found in dist directory"
+          echo "Make sure to build and commit the dist files before creating a release"
+          exit 1
+        fi
+
+    - name: Create release zip
+      run: |
+        mkdir -p release-files
+        cp dist/main.js release-files/
+        cp dist/styles.css release-files/
+        cp dist/manifest.json release-files/
+        cd release-files
+        zip -r ../smart-connections-mcp-fork.zip .
+
+    - name: Get version from manifest
+      id: version
+      run: |
+        VERSION=$(cat dist/manifest.json | grep '"version"' | cut -d'"' -f4)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          smart-connections-mcp-fork.zip
+          dist/main.js
+          dist/styles.css
+          dist/manifest.json
+        name: Smart Connections MCP Fork v${{ steps.version.outputs.version }}
+        body: |
+          ## Smart Connections Fork with MCP Integration
+
+          This release includes the MCP server for integration with Claude Code and other MCP-compatible clients.
+
+          ### Installation
+
+          **Quick Install (Recommended):**
+          ```bash
+          curl -fsSL https://raw.githubusercontent.com/alfypops/obsidian-smart-connections/main/install.sh | bash
+          ```
+
+          **Manual Install:**
+          1. Download `smart-connections-mcp-fork.zip` from this release
+          2. Extract to `YourVault/.obsidian/plugins/smart-connections/`
+          3. Enable the plugin in Obsidian Settings → Community Plugins
+
+          ### What's New in This Fork
+          - 🔍 Vector similarity search via MCP
+          - 🧠 Embedding generation using TaylorAI/bge-micro-v2
+          - 📊 Knowledge base statistics API
+          - 🔌 Programmatic access for external tools
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
