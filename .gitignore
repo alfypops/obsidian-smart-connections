@@ -3,7 +3,6 @@
 .obsidian
 .smart-connections
 .vscode
-dist
 node_modules
 stylesheets
 ref
