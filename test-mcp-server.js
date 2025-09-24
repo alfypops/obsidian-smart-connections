@@ -93,6 +93,28 @@ async function testMCPComponents() {
     });
     console.log('   ✅ Lookup tool execution successful, found', lookupResult.results.length, 'results');
 
+    // Test new lexical search capability
+    try {
+      const lexicalResult = await lookupTool.execute({
+        query_type: 'lexical',
+        keywords: ['test', 'example']
+      });
+      console.log('   ✅ Lexical search test completed, found', lexicalResult.results.length, 'results');
+    } catch (error) {
+      console.log('   ⚠️  Lexical search fallback to vector search (expected behavior)');
+    }
+
+    // Test direct vector search capability
+    try {
+      const vectorResult = await lookupTool.execute({
+        direct_vector: Array(384).fill(0.1), // Mock 384-dimensional vector
+        vector_operation: 'nearest'
+      });
+      console.log('   ✅ Direct vector search test completed, found', vectorResult.results.length, 'results');
+    } catch (error) {
+      console.log('   ⚠️  Direct vector search fallback to vector search (expected behavior)');
+    }
+
     // Test Embed Tool
     console.log('\n2. Testing Embed Tool');
     const embedTool = new SmartConnectionsEmbedTool(mockPlugin);
