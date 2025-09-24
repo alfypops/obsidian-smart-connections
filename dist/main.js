@@ -1,4 +1,4 @@
-/*! obsidian-smart-connections v3.0.81 | (c) 2025 🌴 Brian (Brian Petro) */
+/*! obsidian-smart-connections v3.0.82 | (c) 2025 🌴 Brian (Brian Petro) */
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -38698,7 +38698,6 @@ var SmartConnectionsLookupTool = class {
     };
   }
   async execute(args) {
-    console.log("MCP Lookup Tool - Received args:", JSON.stringify(args, null, 2));
     const {
       query_type = "vector",
       keywords,
@@ -38731,16 +38730,27 @@ var SmartConnectionsLookupTool = class {
         results = get_nearest_until_next_dev_exceeds_std_dev(results);
       }
       results = results.slice(0, searchFilter.limit);
-      const formattedResults = results.map((result) => ({
-        key: result.key || result.id,
-        score: result.score || result.sim || 0,
-        content: result.content || result.data?.content || result.text || "",
-        path: result.path || result.key,
-        type: result.collection_type || "unknown",
-        // Include Smart Connections specific fields
-        breadcrumbs: result.breadcrumbs,
-        size: result.size,
-        last_modified: result.last_modified
+      const formattedResults = await Promise.all(results.map(async (result) => {
+        let content = "";
+        if (result.item && typeof result.item.read === "function") {
+          try {
+            content = await result.item.read();
+          } catch (error) {
+            console.warn(`Failed to read content for ${result.key}:`, error);
+            content = "";
+          }
+        }
+        return {
+          key: result.key || result.id,
+          score: result.score || result.sim || 0,
+          content: content || "",
+          path: result.path || result.key,
+          type: result.collection_type || "unknown",
+          // Include Smart Connections specific fields
+          breadcrumbs: result.breadcrumbs,
+          size: result.size,
+          last_modified: result.last_modified
+        };
       }));
       return {
         results: formattedResults,

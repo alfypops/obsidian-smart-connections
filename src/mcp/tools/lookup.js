@@ -99,8 +99,6 @@ export class SmartConnectionsLookupTool {
   }
 
   async execute(args) {
-    // DEBUG: Log all incoming parameters
-    console.log('MCP Lookup Tool - Received args:', JSON.stringify(args, null, 2));
 
     const {
       query_type = "vector",
@@ -152,17 +150,32 @@ export class SmartConnectionsLookupTool {
       // Apply limit
       results = results.slice(0, searchFilter.limit);
 
-      // Format results
-      const formattedResults = results.map(result => ({
-        key: result.key || result.id,
-        score: result.score || result.sim || 0,
-        content: result.content || result.data?.content || result.text || '',
-        path: result.path || result.key,
-        type: result.collection_type || 'unknown',
-        // Include Smart Connections specific fields
-        breadcrumbs: result.breadcrumbs,
-        size: result.size,
-        last_modified: result.last_modified,
+
+      // Format results and load content using Smart Connections read() method
+      const formattedResults = await Promise.all(results.map(async (result) => {
+        let content = '';
+
+        // Smart Connections entities have a read() method to get content
+        if (result.item && typeof result.item.read === 'function') {
+          try {
+            content = await result.item.read();
+          } catch (error) {
+            console.warn(`Failed to read content for ${result.key}:`, error);
+            content = '';
+          }
+        }
+
+        return {
+          key: result.key || result.id,
+          score: result.score || result.sim || 0,
+          content: content || '',
+          path: result.path || result.key,
+          type: result.collection_type || 'unknown',
+          // Include Smart Connections specific fields
+          breadcrumbs: result.breadcrumbs,
+          size: result.size,
+          last_modified: result.last_modified,
+        };
       }));
 
       return {
@@ -351,6 +364,7 @@ export class SmartConnectionsLookupTool {
       }
 
       const results = await collection.lookup(lookupParams);
+
 
       // Ensure results is an array before mapping
       if (!Array.isArray(results)) {
