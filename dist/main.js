@@ -1,4 +1,4 @@
-/*! obsidian-smart-connections v3.0.80 | (c) 2025 🌴 Brian (Brian Petro) */
+/*! obsidian-smart-connections v3.0.81 | (c) 2025 🌴 Brian (Brian Petro) */
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
